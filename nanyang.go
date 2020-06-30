@@ -20,7 +20,7 @@ func NanyangStart() {
 	logrus.Info("nanyang start ------")
 	nanyangUpdateToken()
 	nanyangUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", nanyangUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", nanyangUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", nanyangSendData)

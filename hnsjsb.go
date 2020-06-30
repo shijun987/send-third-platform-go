@@ -22,7 +22,7 @@ func HnsjsbStart() {
 	logrus.Info("hnsjsb start ------")
 	hnsjsbUpdateToken()
 	hnsjsbUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", hnsjsbUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", hnsjsbUpdateDevices)
 	c.AddFunc("0 0/5 * * * *", hnsjsbSendData)

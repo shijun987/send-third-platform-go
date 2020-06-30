@@ -20,7 +20,7 @@ func ZhatucangStart() {
 	logrus.Info("zhatucang start ------")
 	zhatucangUpdateToken()
 	zhatucangUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", zhatucangUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", zhatucangUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", zhatucangSendData)

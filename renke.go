@@ -51,7 +51,7 @@ type RealTimeData struct {
 func RenkeStart() {
 	logrus.Info("renke start ------")
 	renkeSendData()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0/1 * * * *", renkeSendData)
 	c.Start()
 	defer c.Stop()

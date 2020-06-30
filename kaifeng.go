@@ -20,7 +20,7 @@ func KaifengStart() {
 	logrus.Info("kaifeng start ------")
 	kaifengUpdateToken()
 	kaifengUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", kaifengUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", kaifengUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", kaifengSendData)

@@ -20,7 +20,7 @@ func HnhebiStart() {
 	logrus.Info("hnhebi start ------")
 	hnhebiUpdateToken()
 	hnhebiUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", hnhebiUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", hnhebiUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", hnhebiSendData)

@@ -5,7 +5,6 @@
 ```shell
 CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build
 
-$env:GO111MODULE="off"
 $env:GOOS="linux"
 $env:GOARCH="amd64"
 go build

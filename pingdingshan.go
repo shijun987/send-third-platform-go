@@ -20,7 +20,7 @@ func PingdingshanStart() {
 	logrus.Info("pingdingshan start ------")
 	pingdingshanUpdateToken()
 	pingdingshanUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", pingdingshanUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", pingdingshanUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", pingdingshanSendData)

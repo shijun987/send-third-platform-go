@@ -20,7 +20,7 @@ func ZhumadianStart() {
 	logrus.Info("zhumadian start ------")
 	zhumadianUpdateToken()
 	zhumadianUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", zhumadianUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", zhumadianUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", zhumadianSendData)

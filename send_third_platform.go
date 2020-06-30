@@ -38,6 +38,8 @@ func main() {
 
 	go RenkeStart()
 
+	go LinghuiStart()
+
 	select {}
 
 }

@@ -20,7 +20,7 @@ func GuokongStart() {
 	logrus.Info("guokong start ------")
 	guokongUpdateToken()
 	guokongUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", guokongUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", guokongUpdateDevices)
 	c.AddFunc("0 0/10 * * * *", guokongSendData)

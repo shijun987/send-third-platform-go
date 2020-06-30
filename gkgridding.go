@@ -22,7 +22,7 @@ func GkgriddingStart() {
 	logrus.Info("gkgridding start ------")
 	gkgriddingUpdateToken()
 	gkgriddingUpdateDevices()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", gkgriddingUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", gkgriddingUpdateDevices)
 	c.AddFunc("0 0/5 * * * *", gkgriddingSendData)

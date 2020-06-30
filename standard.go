@@ -32,7 +32,7 @@ type StandardData struct {
 func StandardStart() {
 	logrus.Info("standard start ------")
 	updateStandard()
-	c := cron.New(cron.WithSeconds())
+	c := cron.New()
 	c.AddFunc("0 0/5 * * * *", updateStandard)
 	c.Start()
 	defer c.Stop()
