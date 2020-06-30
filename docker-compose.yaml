@@ -1,0 +1,7 @@
+version: '3.1'
+
+services:
+  send-third-platform-henan:
+    image: registry.cn-hangzhou.aliyuncs.com/whxph/send-third-platform-henan
+    container_name: send-third-platform-henan
+    restart: always
