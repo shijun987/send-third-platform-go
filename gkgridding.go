@@ -25,7 +25,7 @@ func GkgriddingStart() {
 	c := cron.New()
 	c.AddFunc("0 0 0/12 * * *", gkgriddingUpdateToken)
 	c.AddFunc("0 0 0/1 * * *", gkgriddingUpdateDevices)
-	c.AddFunc("0 0/5 * * * *", gkgriddingSendData)
+	c.AddFunc("0 */5 * * * *", gkgriddingSendData)
 	c.Start()
 	defer c.Stop()
 	select {}
@@ -51,7 +51,7 @@ func gkgriddingSendData() {
 		var dataEntity DataEntity
 		json.Unmarshal(result, &dataEntity)
 		if len(dataEntity.Entity) > 0 {
-			datatime, _ := time.Parse("2016-01-02 15:04:05", dataEntity.Entity[0].Datetime)
+			datatime, _ := time.Parse("2006-01-02 15:04:05", dataEntity.Entity[0].Datetime)
 			if datatime.After(time.Now().Add(time.Duration(-time.Hour))) {
 				humi := String2float(dataEntity.Entity[3].EValue)
 				temp := String2float(dataEntity.Entity[2].EValue)
