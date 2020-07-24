@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"bytes"
@@ -49,7 +49,7 @@ func Invoke(url, value string) {
 		</soap:Envelope>
 	`))
 	}
-	
+
 	req, err := http.NewRequest("POST", url, bytes.NewReader(payload))
 	if err != nil {
 		return

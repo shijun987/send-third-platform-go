@@ -1,4 +1,4 @@
-package main
+package linghui
 
 import (
 	"bytes"
@@ -7,13 +7,16 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"whxph.com/send-third-platform/xphapi"
 
 	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 )
 
-var linghuiToken string
-var linghuiDevices []Device
+var (
+	linghuiToken string
+	linghuiDevices []xphapi.Device
+)
 
 // LinghuiData LinghuiData
 type LinghuiData struct {
@@ -28,26 +31,26 @@ type LinghuiStruct struct {
 	Data []LinghuiData `json:"data"`
 }
 
-// LinghuiStart 灵慧识别
-func LinghuiStart() {
+// Start 灵慧识别
+func Start() {
 	logrus.Info("3961422 start ------")
 	linghuiUpdateToken()
 	linghuiUpdateDevices()
 	c := cron.New()
-	c.AddFunc("0 0 0/12 * * *", linghuiUpdateToken)
-	c.AddFunc("0 0 0/1 * * *", linghuiUpdateDevices)
-	c.AddFunc("0 0/2 * * * *", linghuiSendData)
+	_ = c.AddFunc("0 0 0/12 * * *", linghuiUpdateToken)
+	_ = c.AddFunc("0 0 0/1 * * *", linghuiUpdateDevices)
+	_ = c.AddFunc("0 0/2 * * * *", linghuiSendData)
 	c.Start()
 	defer c.Stop()
 	select {}
 }
 
 func linghuiUpdateToken() {
-	linghuiToken = NewGetToken("3961422", "123456")
+	linghuiToken = xphapi.NewGetToken("3961422", "123456")
 }
 
 func linghuiUpdateDevices() {
-	linghuiDevices = NewGetDevices("3961422", linghuiToken)
+	linghuiDevices = xphapi.NewGetDevices("3961422", linghuiToken)
 }
 
 func linghuiSendData() {
@@ -58,13 +61,12 @@ func linghuiSendData() {
 			return
 
 		}
-		defer resp.Body.Close()
 		result, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			continue
 		}
-		dataEntity := DataEntity{}
-		json.Unmarshal(result, &dataEntity)
+		dataEntity := xphapi.DataEntity{}
+		_ = json.Unmarshal(result, &dataEntity)
 		if len(dataEntity.Entity) > 0 {
 
 			linghuiStruct := LinghuiStruct{}
@@ -88,7 +90,6 @@ func linghuiSendData() {
 			if err != nil {
 				logrus.Error(err)
 			}
-			defer resp.Body.Close()
 
 			result, err := ioutil.ReadAll(resp.Body)
 			if err != nil {

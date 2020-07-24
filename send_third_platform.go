@@ -2,6 +2,20 @@ package main
 
 import (
 	"github.com/sirupsen/logrus"
+	"whxph.com/send-third-platform/czzhujian"
+	"whxph.com/send-third-platform/gkgridding"
+	"whxph.com/send-third-platform/guokong"
+	"whxph.com/send-third-platform/hnhebi"
+	"whxph.com/send-third-platform/hnsjsb"
+	"whxph.com/send-third-platform/kaifeng"
+	"whxph.com/send-third-platform/linghui"
+	"whxph.com/send-third-platform/nanyang"
+	"whxph.com/send-third-platform/nanyang2019"
+	"whxph.com/send-third-platform/pingdingshan"
+	"whxph.com/send-third-platform/renke"
+	"whxph.com/send-third-platform/standard"
+	"whxph.com/send-third-platform/zhatucang"
+	"whxph.com/send-third-platform/zhumadian"
 )
 
 func init() {
@@ -14,31 +28,33 @@ func init() {
 
 func main() {
 
-	go StandardStart()
+	go standard.Start()
 
-	go GuokongStart()
+	go guokong.Start()
 
-	go HnhebiStart()
+	go hnhebi.Start()
 
-	go KaifengStart()
+	go kaifeng.Start()
 
-	go NanyangStart()
+	go nanyang.Start()
 
-	go Nanyang2019Start()
+	go nanyang2019.Start()
 
-	go PingdingshanStart()
+	go pingdingshan.Start()
 
-	go ZhatucangStart()
+	go zhatucang.Start()
 
-	go ZhumadianStart()
+	go zhumadian.Start()
 
-	go GkgriddingStart()
+	go gkgridding.Start()
 
-	go HnsjsbStart()
+	go hnsjsb.Start()
 
-	go RenkeStart()
+	go renke.Start()
 
-	go LinghuiStart()
+	go linghui.Start()
+
+	go czzhujian.Start()
 
 	select {}
 

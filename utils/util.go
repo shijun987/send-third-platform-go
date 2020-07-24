@@ -1,4 +1,4 @@
-package main
+package utils
 
 import (
 	"strconv"
@@ -20,7 +20,7 @@ func Crc16(buf []byte, len int) uint16 {
 	}
 
 	for i := 0; i < len; i++ {
-		crc ^= (uint16(buf[i]) & 0x00FF)
+		crc ^= uint16(buf[i]) & 0x00FF
 		for j := 0; j < 8; j++ {
 			if (crc & 0x0001) != 0 {
 				crc >>= 1

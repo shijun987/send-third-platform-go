@@ -1,4 +1,4 @@
-package main
+package pingdingshan
 
 import (
 	"encoding/json"
@@ -7,34 +7,38 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"whxph.com/send-third-platform/utils"
+	"whxph.com/send-third-platform/xphapi"
 
 	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 )
 
-var pingdingshanToken string
-var pingdingshanDevices []Device
+var (
+	pingdingshanToken string
+	pingdingshanDevices []xphapi.Device
+)
 
-// PingdingshanStart pingdingshan
-func PingdingshanStart() {
+// Start pingdingshan
+func Start() {
 	logrus.Info("pingdingshan start ------")
 	pingdingshanUpdateToken()
 	pingdingshanUpdateDevices()
 	c := cron.New()
-	c.AddFunc("0 0 0/12 * * *", pingdingshanUpdateToken)
-	c.AddFunc("0 0 0/1 * * *", pingdingshanUpdateDevices)
-	c.AddFunc("0 0/10 * * * *", pingdingshanSendData)
+	_ = c.AddFunc("0 0 0/12 * * *", pingdingshanUpdateToken)
+	_ = c.AddFunc("0 0 0/1 * * *", pingdingshanUpdateDevices)
+	_ = c.AddFunc("0 0/10 * * * *", pingdingshanSendData)
 	c.Start()
 	defer c.Stop()
 	select {}
 }
 
 func pingdingshanUpdateToken() {
-	pingdingshanToken = GetToken("pingdingshan", "123456")
+	pingdingshanToken = xphapi.GetToken("pingdingshan", "123456")
 }
 
 func pingdingshanUpdateDevices() {
-	pingdingshanDevices = GetDevices("pingdingshan", pingdingshanToken)
+	pingdingshanDevices = xphapi.GetDevices("pingdingshan", pingdingshanToken)
 }
 
 func pingdingshanSendData() {
@@ -44,10 +48,9 @@ func pingdingshanSendData() {
 			logrus.Error("获取数据异常")
 			return
 		}
-		defer resp.Body.Close()
 		result, _ := ioutil.ReadAll(resp.Body)
-		var dataEntity DataEntity
-		json.Unmarshal(result, &dataEntity)
+		var dataEntity xphapi.DataEntity
+		_ = json.Unmarshal(result, &dataEntity)
 		if len(dataEntity.Entity) > 0 {
 			datatime, _ := time.Parse("2006-01-02 15:04:05", dataEntity.Entity[0].Datetime)
 			if datatime.After(time.Now().Add(time.Duration(-time.Hour))) {
@@ -55,13 +58,13 @@ func pingdingshanSendData() {
 				content := "DevID:|:" + id +
 					"#|#Time:|:" + dataEntity.Entity[0].Datetime +
 					"#|#HUMI:|:-1#|#TEMP:|:-1#|#PRE:|:0#|#WINDD:|:-1" +
-					"#|#WINDS:|:" + fmt.Sprintf("%.2f", String2float(dataEntity.Entity[0].EValue)) +
-					"#|#NOISE:|:" + fmt.Sprintf("%.2f", String2float(dataEntity.Entity[4].EValue)) +
-					"#|#PM25:|:" + fmt.Sprintf("%.2f", String2float(dataEntity.Entity[5].EValue)) +
-					"#|#PM10:|:" + fmt.Sprintf("%.2f", String2float(dataEntity.Entity[6].EValue)) +
+					"#|#WINDS:|:" + fmt.Sprintf("%.2f", utils.String2float(dataEntity.Entity[0].EValue)) +
+					"#|#NOISE:|:" + fmt.Sprintf("%.2f", utils.String2float(dataEntity.Entity[4].EValue)) +
+					"#|#PM25:|:" + fmt.Sprintf("%.2f", utils.String2float(dataEntity.Entity[5].EValue)) +
+					"#|#PM10:|:" + fmt.Sprintf("%.2f", utils.String2float(dataEntity.Entity[6].EValue)) +
 					"#|#TSP:|:0"
 				logrus.Info("[" + strconv.Itoa(dataEntity.DeviceID) + "]: " + content)
-				Invoke("http://123.163.55.113:8686/pdssanitate/services/SaveYCJCService", content)
+				utils.Invoke("http://123.163.55.113:8686/pdssanitate/services/SaveYCJCService", content)
 			} else {
 				logrus.Warn("[" + strconv.Itoa(dataEntity.DeviceID) + "]: 暂无数据")
 			}

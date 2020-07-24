@@ -1,4 +1,4 @@
-package main
+package xphapi
 
 import (
 	"bytes"
@@ -61,7 +61,7 @@ func GetToken(username, password string) string {
 
 	result, _ := ioutil.ReadAll(resp.Body)
 	var token Token
-	json.Unmarshal(result, &token)
+	_ = json.Unmarshal(result, &token)
 	return token.Token
 }
 
@@ -80,6 +80,6 @@ func GetDevices(username, token string) []Device {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	var user User
-	json.Unmarshal(body, &user)
+	_ = json.Unmarshal(body, &user)
 	return user.Devices
 }

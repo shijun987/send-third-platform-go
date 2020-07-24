@@ -1,4 +1,4 @@
-package main
+package hnsjsb
 
 import (
 	"bytes"
@@ -9,34 +9,39 @@ import (
 	"net/http"
 	"strconv"
 	"time"
+	"whxph.com/send-third-platform/standard"
+	"whxph.com/send-third-platform/utils"
+	"whxph.com/send-third-platform/xphapi"
 
 	"github.com/robfig/cron"
 	"github.com/sirupsen/logrus"
 )
 
-var hnsjsbToken string
-var hnsjsbDevices []Device
+var (
+	hnsjsbToken string
+	hnsjsbDevices []xphapi.Device
+)
 
-// HnsjsbStart hnsjsb
-func HnsjsbStart() {
+// Start hnsjsb
+func Start() {
 	logrus.Info("hnsjsb start ------")
 	hnsjsbUpdateToken()
 	hnsjsbUpdateDevices()
 	c := cron.New()
-	c.AddFunc("0 0 0/12 * * *", hnsjsbUpdateToken)
-	c.AddFunc("0 0 0/1 * * *", hnsjsbUpdateDevices)
-	c.AddFunc("0 0/5 * * * *", hnsjsbSendData)
+	_ = c.AddFunc("0 0 0/12 * * *", hnsjsbUpdateToken)
+	_ = c.AddFunc("0 0 0/1 * * *", hnsjsbUpdateDevices)
+	_ = c.AddFunc("0 0/5 * * * *", hnsjsbSendData)
 	c.Start()
 	defer c.Stop()
 	select {}
 }
 
 func hnsjsbUpdateToken() {
-	hnsjsbToken = GetToken("hnsjsb", "123456")
+	hnsjsbToken = xphapi.GetToken("hnsjsb", "123456")
 }
 
 func hnsjsbUpdateDevices() {
-	hnsjsbDevices = GetDevices("hnsjsb", hnsjsbToken)
+	hnsjsbDevices = xphapi.GetDevices("hnsjsb", hnsjsbToken)
 	// hnsjsbDevices = append(hnsjsbDevices, Device{DeviceID: 16056972, DeviceName: "一鼎-富力阅山湖"})
 }
 
@@ -47,37 +52,36 @@ func hnsjsbSendData() {
 			logrus.Error("获取数据异常")
 			return
 		}
-		defer resp.Body.Close()
 		result, err := ioutil.ReadAll(resp.Body)
 		if err != nil {
 			continue
 		}
-		var dataEntity DataEntity
-		json.Unmarshal(result, &dataEntity)
+		var dataEntity xphapi.DataEntity
+		_ = json.Unmarshal(result, &dataEntity)
 		if len(dataEntity.Entity) > 0 {
 			datatime, _ := time.Parse("2006-01-02 15:04:05", dataEntity.Entity[0].Datetime)
-			if datatime.After(time.Now().Add(time.Duration(-time.Hour))) {
-				windd := String2float(dataEntity.Entity[1].EValue)
-				winds := String2float(dataEntity.Entity[0].EValue)
-				noise := String2float(dataEntity.Entity[5].EValue)
-				pm25 := String2float(dataEntity.Entity[2].EValue)
-				pm10 := String2float(dataEntity.Entity[3].EValue)
+			if datatime.After(time.Now().Add(-time.Hour)) {
+				windd := utils.String2float(dataEntity.Entity[1].EValue)
+				winds := utils.String2float(dataEntity.Entity[0].EValue)
+				noise := utils.String2float(dataEntity.Entity[5].EValue)
+				pm25 := utils.String2float(dataEntity.Entity[2].EValue)
+				pm10 := utils.String2float(dataEntity.Entity[3].EValue)
 				if windd >= 32767 {
-					windd = standardData.windd
+					windd = standard.StandData.Windd
 				}
 				if winds >= 3276 {
-					winds = standardData.winds
+					winds = standard.StandData.Winds
 				}
 				if noise >= 3276 {
-					noise = standardData.noise
+					noise = standard.StandData.Noise
 				}
 				if pm25 >= 32767 || pm25 <= 0 {
 					rand.Seed(time.Now().UnixNano())
-					pm25 = standardData.pm25 + (float64)(rand.Intn(6))
+					pm25 = standard.StandData.Pm25 + (float64)(rand.Intn(6))
 				}
 				if pm10 >= 32767 || pm10 <= 0 {
 					rand.Seed(time.Now().UnixNano())
-					pm10 = standardData.pm10 + (float64)(rand.Intn(11))
+					pm10 = standard.StandData.Pm10 + (float64)(rand.Intn(11))
 				}
 				id := "101" + strconv.Itoa(item.DeviceID)[2:]
 				if item.DeviceID == 16056972 {
@@ -100,7 +104,6 @@ func hnsjsbSendData() {
 				if err != nil {
 					logrus.Error(err)
 				}
-				defer resp.Body.Close()
 
 				result, err := ioutil.ReadAll(resp.Body)
 				if err != nil {

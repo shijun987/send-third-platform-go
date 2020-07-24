@@ -1,20 +1,18 @@
-package main
+package renke
 
 import (
 	"encoding/hex"
 	"encoding/json"
+	"github.com/robfig/cron"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net"
 	"net/http"
 	"strconv"
 	"strings"
 	"time"
-
-	"github.com/robfig/cron"
-	"github.com/sirupsen/logrus"
+	"whxph.com/send-third-platform/utils"
 )
-
-var renkeToken string
 
 // Renke 消息体
 type Renke struct {
@@ -47,25 +45,21 @@ type RealTimeData struct {
 	Alarm     bool   `json:"alarm"`
 }
 
-// RenkeStart 建大仁科温湿度计
-func RenkeStart() {
+// Start 建大仁科温湿度计
+func Start() {
 	logrus.Info("renke start ------")
 	renkeSendData()
 	c := cron.New()
-	c.AddFunc("0 0/1 * * * *", renkeSendData)
+	_ = c.AddFunc("0 0/1 * * * *", renkeSendData)
 	c.Start()
 	defer c.Stop()
 	select {}
 }
 
-func renkeUpdateToken() {
-	guokongToken = GetToken("218143201", "123456")
-}
-
 func renkeSendData() {
 	client := &http.Client{Timeout: 5 * time.Second}
 	req, err := http.NewRequest("GET", "http://www.0531yun.cn/wsjc/app/GetDeviceData?groupId=103001", nil)
-	if err != nil {
+	if err != nil || req == nil {
 		logrus.Error("ReadAll error: ", err.Error())
 	}
 	req.Header.Set("userId", "9998")
@@ -79,7 +73,7 @@ func renkeSendData() {
 		return
 	}
 	var renkeData Renke
-	json.Unmarshal(body, &renkeData)
+	_ = json.Unmarshal(body, &renkeData)
 
 	if renkeData.Data[0].RealTimeData[0].DataValue != "" {
 		temperature, _ := strconv.ParseFloat(renkeData.Data[0].RealTimeData[0].DataValue, 64)
@@ -104,16 +98,15 @@ func renkeSendData() {
 		for i := 0; i < 32; i++ {
 			sendData[38+i] = 0x00
 		}
-		crc := Crc16(sendData, 70)
+		crc := utils.Crc16(sendData, 70)
 		sendData[70] = byte(crc & 0xFF)
 		sendData[71] = byte(crc >> 8)
 		logrus.Info(strings.ToUpper(hex.EncodeToString(sendData)))
 		conn, err := net.Dial("tcp", "47.105.215.208:8880")
-		defer conn.Close()
 		if err != nil {
 			logrus.Error("connect failed, err : %v\n", err.Error())
 		}
-		conn.Write(sendData)
+		_, _ = conn.Write(sendData)
 		result, err := ioutil.ReadAll(conn)
 		if err != nil {
 			logrus.Error("ReadAll error: ", err.Error())

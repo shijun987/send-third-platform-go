@@ -1,13 +1,12 @@
-package main
+package xphapi
 
 import (
 	"bytes"
 	"encoding/json"
+	"github.com/sirupsen/logrus"
 	"io/ioutil"
 	"net/http"
 	"time"
-
-	"github.com/sirupsen/logrus"
 )
 
 // NewGetToken 获取token
@@ -24,7 +23,7 @@ func NewGetToken(username, password string) string {
 
 	result, _ := ioutil.ReadAll(resp.Body)
 	var token Token
-	json.Unmarshal(result, &token)
+	_ = json.Unmarshal(result, &token)
 	return token.Token
 }
 
@@ -43,6 +42,6 @@ func NewGetDevices(username, token string) []Device {
 	defer resp.Body.Close()
 	body, _ := ioutil.ReadAll(resp.Body)
 	var user User
-	json.Unmarshal(body, &user)
+	_ = json.Unmarshal(body, &user)
 	return user.Devices
 }
