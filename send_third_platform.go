@@ -28,31 +28,31 @@ func init() {
 
 func main() {
 
-	go standard.Start()
+	// go standard.Start()
 
-	go guokong.Start()
+	// go guokong.Start()
 
-	go hnhebi.Start()
+	// go hnhebi.Start()
 
-	go kaifeng.Start()
+	// go kaifeng.Start()
 
-	go nanyang.Start()
+	// go nanyang.Start()
 
-	go nanyang2019.Start()
+	// go nanyang2019.Start()
 
-	go pingdingshan.Start()
+	// go pingdingshan.Start()
 
-	go zhatucang.Start()
+	// go zhatucang.Start()
 
-	go zhumadian.Start()
+	// go zhumadian.Start()
 
-	go gkgridding.Start()
+	// go gkgridding.Start()
 
-	go hnsjsb.Start()
+	// go hnsjsb.Start()
 
-	go renke.Start()
+	// go renke.Start()
 
-	go linghui.Start()
+	// go linghui.Start()
 
 	go czzhujian.Start()
 
